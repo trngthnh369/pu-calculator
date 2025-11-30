@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Calculator, Zap } from 'lucide-react';
 import { MoldType, CalculationParams, CalculationResult, Preset } from '@/lib/types';
@@ -44,7 +44,33 @@ export default function PUCalculator() {
     };
     const calcResult = calculate(params);
     setResult(calcResult);
+    setShowResultOverlay(true);
   };
+
+  // Show result overlay after calculation so users don't need to scroll
+  const [showResultOverlay, setShowResultOverlay] = useState(false);
+
+  // Lock body scroll while overlay is open
+  useEffect(() => {
+    if (showResultOverlay) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => { document.body.style.overflow = prev; };
+    }
+    return;
+  }, [showResultOverlay]);
+
+  // Close overlay on Escape
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setShowResultOverlay(false);
+    };
+    if (showResultOverlay) {
+      window.addEventListener('keydown', onKey);
+      return () => window.removeEventListener('keydown', onKey);
+    }
+    return;
+  }, [showResultOverlay]);
 
   const loadPreset = (preset: Preset) => {
     setThickness(preset.thickness);
@@ -56,7 +82,7 @@ export default function PUCalculator() {
   const currentPresets = moldType === 'circular' ? CIRCULAR_PRESETS : SADDLE_PRESETS;
 
   return (
-    <div className="min-h-screen text-white" style={{ background: '#0B1121' }}>
+    <div className="min-h-screen text-white overscroll-none" style={{ background: '#0B1121' }}>
       {/* Header */}
       <Header
         onSettingsClick={() => setShowSettings(!showSettings)}
@@ -64,6 +90,53 @@ export default function PUCalculator() {
         showSettings={showSettings}
         showPresets={showPresets}
       />
+
+      {/* Result overlay (appears after calculation) */}
+      {result && showResultOverlay && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-6"
+          onClick={() => setShowResultOverlay(false)}
+        >
+          <div className="max-w-3xl w-full" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-[#0B1121] rounded-2xl p-6 border" style={{ borderColor: '#2A3B55' }}>
+              <div className="flex justify-between items-start mb-4">
+                <div className="text-lg font-semibold">Kết quả</div>
+                <button
+                  onClick={() => setShowResultOverlay(false)}
+                  className="p-2 rounded-md"
+                  style={{ color: '#94A3B8' }}
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <ResultCard label="POLYOL (PART A)" value={result.polyol} unit="kg" color="cyan" delay={0} valueClassName="text-4xl" />
+                <ResultCard label="ISOCYANATE (PART B)" value={result.isocyanate} unit="kg" color="yellow" delay={100} valueClassName="text-4xl" />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-xl p-4 border" style={{ background: '#151E32', borderColor: '#2A3B55' }}>
+                  <div className="text-xs uppercase tracking-wider mb-1.5" style={{ color: '#94A3B8' }}>DIỆN TÍCH</div>
+                  <div className="font-mono text-white text-lg font-bold">{result.area} m²</div>
+                </div>
+                <div className="rounded-xl p-4 border" style={{ background: '#151E32', borderColor: '#2A3B55' }}>
+                  <div className="text-xs uppercase tracking-wider mb-1.5" style={{ color: '#94A3B8' }}>THỂ TÍCH</div>
+                  <div className="font-mono text-white text-lg font-bold">{result.volume} m³</div>
+                </div>
+                <div className="rounded-xl p-4 border" style={{ background: '#151E32', borderColor: '#2A3B55' }}>
+                  <div className="text-xs uppercase tracking-wider mb-1.5" style={{ color: '#94A3B8' }}>KL THÀNH PHẨM</div>
+                  <div className="font-mono text-white text-lg font-bold">{result.finishedMass} kg</div>
+                </div>
+                <div className="rounded-xl p-4 border" style={{ background: '#151E32', borderColor: '#2A3B55' }}>
+                  <div className="text-xs uppercase tracking-wider mb-1.5" style={{ color: '#94A3B8' }}>KL CẦN DÙNG</div>
+                  <div className="font-mono text-white text-lg font-bold">{result.requiredMass} kg</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Settings Panel */}
       <SettingsPanel
@@ -81,9 +154,9 @@ export default function PUCalculator() {
 
       {/* Main Content - Golden Ratio Layout */}
       <div className="container mx-auto px-6 py-8">
-        <div className="flex flex-col lg:flex-row gap-6 min-h-[calc(100vh-140px)]">
-          {/* Input Area - 61.8% */}
-          <div className="flex-[1.618] flex flex-col gap-6">
+        <div className="flex flex-col lg:flex-row gap-6 min-h-0">
+          {/* Input Area (full width now that inline results are removed) */}
+          <div className="flex-1 flex flex-col gap-6">
             {/* Mold Type Selector */}
             <SegmentedControl value={moldType} onChange={setMoldType} />
 
@@ -131,103 +204,7 @@ export default function PUCalculator() {
             </motion.button>
           </div>
 
-          {/* Result Area - 38.2% */}
-          <div className="flex-[1] flex flex-col gap-5">
-            {result ? (
-              <>
-                <ResultCard
-                  label="POLYOL (PART A)"
-                  value={result.polyol}
-                  unit="kg"
-                  color="cyan"
-                  delay={0}
-                />
-                <ResultCard
-                  label="ISOCYANATE (PART B)"
-                  value={result.isocyanate}
-                  unit="kg"
-                  color="yellow"
-                  delay={100}
-                />
-                
-                {/* Additional Info */}
-                <div className="grid grid-cols-2 gap-3">
-                  <motion.div 
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="rounded-xl p-4 border"
-                    style={{
-                      background: '#151E32',
-                      borderColor: '#2A3B55'
-                    }}
->
-                    <div className="text-xs uppercase tracking-wider mb-1.5" style={{ color: '#94A3B8' }}>
-                      DIỆN TÍCH
-                    </div>
-                    <div className="font-mono text-white text-lg font-bold">{result.area} m²</div>
-                  </motion.div>
-                  <motion.div 
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.25 }}
-                    className="rounded-xl p-4 border"
-                    style={{
-                      background: '#151E32',
-                      borderColor: '#2A3B55'
-                    }}
->
-                    <div className="text-xs uppercase tracking-wider mb-1.5" style={{ color: '#94A3B8' }}>
-                      THỂ TÍCH
-                    </div>
-                    <div className="font-mono text-white text-lg font-bold">{result.volume} m³</div>
-                  </motion.div>
-                  <motion.div 
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="rounded-xl p-4 border"
-                    style={{
-                      background: '#151E32',
-                      borderColor: '#2A3B55'
-                    }}
->
-                    <div className="text-xs uppercase tracking-wider mb-1.5" style={{ color: '#94A3B8' }}>
-                      KL THÀNH PHẨM
-                    </div>
-                    <div className="font-mono text-white text-lg font-bold">{result.finishedMass} kg</div>
-                  </motion.div>
-                  <motion.div 
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.35 }}
-                    className="rounded-xl p-4 border"
-                    style={{
-                      background: '#151E32',
-                      borderColor: '#2A3B55'
-                    }}
->
-                    <div className="text-xs uppercase tracking-wider mb-1.5" style={{ color: '#94A3B8' }}>
-                      KL CẦN DÙNG
-                    </div>
-                    <div className="font-mono text-white text-lg font-bold">{result.requiredMass} kg</div>
-                  </motion.div>
-                </div>
-              </>
-            ) : (
-              <div className="flex items-center justify-center h-full">
-                <motion.div 
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.3 }}
-                  className="text-center"
-                  style={{ color: '#2A3B55' }}>
-                  <Calculator className="w-20 h-20 mx-auto mb-4 opacity-30" />
-                  <p className="text-lg">Nhập thông số và nhấn TÍNH TOÁN</p>
-                </motion.div>
-              </div>
-            )}
-          </div>
+          {/* Inline result panel removed — results now appear only in the overlay */}
         </div>
       </div>
     </div>

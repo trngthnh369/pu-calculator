@@ -8,10 +8,11 @@ interface ResultCardProps {
   value: number;
   unit: string;
   color: 'cyan' | 'yellow';
+  valueClassName?: string;
   delay?: number;
 }
 
-export default function ResultCard({ label, value, unit, color, delay = 0 }: ResultCardProps) {
+export default function ResultCard({ label, value, unit, color, valueClassName = 'text-6xl', delay = 0 }: ResultCardProps) {
   const [displayValue, setDisplayValue] = useState(0);
 
   useEffect(() => {
@@ -62,12 +63,12 @@ export default function ResultCard({ label, value, unit, color, delay = 0 }: Res
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: delay / 1000, duration: 0.4 }}
       whileHover={{ scale: 1.02, y: -4 }}
-      className={`rounded-2xl p-7 border transition-all duration-300 ${currentStyle.glowClass}`}
+      className={`min-w-0 overflow-hidden rounded-2xl p-7 border transition-all duration-300 ${currentStyle.glowClass}`}
       style={{
         background: currentStyle.background,
         borderColor: currentStyle.borderColor
       }}
->
+    >
       <div 
         className="text-xs uppercase tracking-wider font-medium mb-3"
         style={{ color: '#94A3B8' }}
@@ -75,7 +76,7 @@ export default function ResultCard({ label, value, unit, color, delay = 0 }: Res
         {label}
       </div>
       <div 
-        className="text-6xl font-mono font-bold mb-2 leading-none"
+        className={`${valueClassName} font-mono font-bold mb-2 leading-none wrap-break-word whitespace-normal`}
         style={{ color: currentStyle.textColor }}>
         {displayValue.toFixed(2)}
       </div>

@@ -40,7 +40,7 @@ export default function ParameterInputCard({
   return (
     <div className="flex-1 min-w-0">
       <div 
-        className="rounded-2xl p-6 border h-full transition-all duration-300"
+        className="rounded-2xl p-4 border h-full transition-all duration-300"
         style={{
           background: '#151E32',
           borderColor: isHovered ? '#00E5FF50' : '#2A3B55',
@@ -108,7 +108,7 @@ export default function ParameterInputCard({
                   setTempValue(value.toString());
                 }
               }}
-              className="w-full text-white text-5xl font-mono font-bold px-4 py-3 rounded-xl border-2 focus:outline-none glow-cyan"
+              className="w-full text-white text-3xl font-mono font-bold px-3 py-2 rounded-xl border-2 focus:outline-none glow-cyan"
               style={{
                 background: '#0B1121',
                 borderColor: '#00E5FF'
@@ -118,9 +118,9 @@ export default function ParameterInputCard({
           </div>
         ) : (
           <div className="mb-5">
-            <div className="text-5xl font-mono font-bold text-white leading-none">
+            <div className="text-4xl font-mono font-bold text-white leading-none">
               {value}
-              <span className="text-2xl ml-2" style={{ color: '#00E5FF' }}>{unit}</span>
+              <span className="text-xl ml-2" style={{ color: '#00E5FF' }}>{unit}</span>
             </div>
           </div>
         )}
