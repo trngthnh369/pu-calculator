@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { Calculator, Zap } from 'lucide-react';
 import { MoldType, CalculationParams, CalculationResult, Preset } from '@/lib/types';
 import { calculate } from '@/lib/calculations';
@@ -92,51 +92,74 @@ export default function PUCalculator() {
       />
 
       {/* Result overlay (appears after calculation) */}
-      {result && showResultOverlay && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-6"
-          onClick={() => setShowResultOverlay(false)}
-        >
-          <div className="max-w-3xl w-full" onClick={(e) => e.stopPropagation()}>
-            <div className="bg-[#0B1121] rounded-2xl p-6 border" style={{ borderColor: '#2A3B55' }}>
-              <div className="flex justify-between items-start mb-4">
-                <div className="text-lg font-semibold">Kết quả</div>
-                <button
-                  onClick={() => setShowResultOverlay(false)}
-                  className="p-2 rounded-md"
-                  style={{ color: '#94A3B8' }}
-                >
-                  ✕
-                </button>
-              </div>
+        <AnimatePresence>
+          {result && showResultOverlay && (
+            <motion.div
+              key="result-overlay"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.22, ease: [0.2, 0.8, 0.2, 1] }}
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-6"
+              onClick={() => setShowResultOverlay(false)}
+            >
+              <motion.div
+                key="result-panel"
+                className="max-w-3xl w-full"
+                onClick={(e) => e.stopPropagation()}
+                initial={{ scale: 0.98, y: 8 }}
+                animate={{ scale: 1, y: 0 }}
+                exit={{ scale: 0.98, y: 8 }}
+                transition={{ duration: 0.28, ease: [0.2, 0.8, 0.2, 1] }}
+              >
+                <div className="bg-[#0B1121] rounded-2xl p-6 border" style={{ borderColor: '#2A3B55' }}>
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="text-lg font-semibold">Kết quả</div>
+                    <button
+                      onClick={() => setShowResultOverlay(false)}
+                      className="p-2 rounded-md"
+                      style={{ color: '#94A3B8' }}
+                    >
+                      ✕
+                    </button>
+                  </div>
 
-              <div className="grid grid-cols-2 gap-3 mb-4">
-                <ResultCard label="POLYOL (PART A)" value={result.polyol} unit="kg" color="cyan" delay={0} valueClassName="text-4xl" />
-                <ResultCard label="ISOCYANATE (PART B)" value={result.isocyanate} unit="kg" color="yellow" delay={100} valueClassName="text-4xl" />
-              </div>
+                  <motion.div
+                    className="grid grid-cols-2 gap-3 mb-4"
+                    initial="hidden"
+                    animate="visible"
+                    variants={{
+                      hidden: {},
+                      visible: { transition: { staggerChildren: 0.06, delayChildren: 0.06 } }
+                    } as Variants}
+                  >
+                    <ResultCard label="POLYOL" value={result.polyol} unit="kg" color="cyan" delay={0} valueClassName="text-4xl" variants={{ hidden: { opacity: 0, y: 8 }, visible: { opacity: 1, y: 0, transition: { duration: 0.44 } } }} />
+                    <ResultCard label="ISOCYANATE" value={result.isocyanate} unit="kg" color="yellow" delay={100} valueClassName="text-4xl" variants={{ hidden: { opacity: 0, y: 8 }, visible: { opacity: 1, y: 0, transition: { duration: 0.44 } } }} />
+                  </motion.div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="rounded-xl p-4 border" style={{ background: '#151E32', borderColor: '#2A3B55' }}>
-                  <div className="text-xs uppercase tracking-wider mb-1.5" style={{ color: '#94A3B8' }}>DIỆN TÍCH</div>
-                  <div className="font-mono text-white text-lg font-bold">{result.area} m²</div>
+                  <motion.div className="grid grid-cols-2 gap-3" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12, duration: 0.36 }}>
+                    <div className="rounded-xl p-4 border" style={{ background: '#151E32', borderColor: '#2A3B55' }}>
+                      <div className="text-xs uppercase tracking-wider mb-1.5" style={{ color: '#94A3B8' }}>DIỆN TÍCH</div>
+                      <div className="font-mono text-white text-lg font-bold">{result.area} m²</div>
+                    </div>
+                    <div className="rounded-xl p-4 border" style={{ background: '#151E32', borderColor: '#2A3B55' }}>
+                      <div className="text-xs uppercase tracking-wider mb-1.5" style={{ color: '#94A3B8' }}>THỂ TÍCH</div>
+                      <div className="font-mono text-white text-lg font-bold">{result.volume} m³</div>
+                    </div>
+                    <div className="rounded-xl p-4 border" style={{ background: '#151E32', borderColor: '#2A3B55' }}>
+                      <div className="text-xs uppercase tracking-wider mb-1.5" style={{ color: '#94A3B8' }}>KL THÀNH PHẨM</div>
+                      <div className="font-mono text-white text-lg font-bold">{result.finishedMass} kg</div>
+                    </div>
+                    <div className="rounded-xl p-4 border" style={{ background: '#151E32', borderColor: '#2A3B55' }}>
+                      <div className="text-xs uppercase tracking-wider mb-1.5" style={{ color: '#94A3B8' }}>KL CẦN DÙNG</div>
+                      <div className="font-mono text-white text-lg font-bold">{result.requiredMass} kg</div>
+                    </div>
+                  </motion.div>
                 </div>
-                <div className="rounded-xl p-4 border" style={{ background: '#151E32', borderColor: '#2A3B55' }}>
-                  <div className="text-xs uppercase tracking-wider mb-1.5" style={{ color: '#94A3B8' }}>THỂ TÍCH</div>
-                  <div className="font-mono text-white text-lg font-bold">{result.volume} m³</div>
-                </div>
-                <div className="rounded-xl p-4 border" style={{ background: '#151E32', borderColor: '#2A3B55' }}>
-                  <div className="text-xs uppercase tracking-wider mb-1.5" style={{ color: '#94A3B8' }}>KL THÀNH PHẨM</div>
-                  <div className="font-mono text-white text-lg font-bold">{result.finishedMass} kg</div>
-                </div>
-                <div className="rounded-xl p-4 border" style={{ background: '#151E32', borderColor: '#2A3B55' }}>
-                  <div className="text-xs uppercase tracking-wider mb-1.5" style={{ color: '#94A3B8' }}>KL CẦN DÙNG</div>
-                  <div className="font-mono text-white text-lg font-bold">{result.requiredMass} kg</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
       {/* Settings Panel */}
       <SettingsPanel
