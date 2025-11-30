@@ -39,12 +39,22 @@ export default function ResultCard({ label, value, unit, color, delay = 0 }: Res
     return () => clearTimeout(timer);
   }, [value, delay]);
 
-  const colorClasses = {
-    cyan: 'from-cyan-500/20 to-cyan-600/20 border-cyan-500/50 shadow-cyan-500/30',
-    yellow: 'from-yellow-500/20 to-yellow-600/20 border-yellow-500/50 shadow-yellow-500/30'
+  const styles = {
+    cyan: {
+      background: '#151E32',
+      borderColor: '#00E5FF',
+      textColor: '#00E5FF',
+      glowClass: 'glow-cyan'
+    },
+    yellow: {
+      background: '#151E32',
+      borderColor: '#FFD600',
+      textColor: '#FFD600',
+      glowClass: 'glow-yellow'
+    }
   };
 
-  const textColor = color === 'cyan' ? 'text-cyan-400' : 'text-yellow-400';
+  const currentStyle = styles[color];
 
   return (
     <motion.div
@@ -52,15 +62,26 @@ export default function ResultCard({ label, value, unit, color, delay = 0 }: Res
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: delay / 1000, duration: 0.4 }}
       whileHover={{ scale: 1.02, y: -4 }}
-      className={`bg-gradient-to-br ${colorClasses[color]} backdrop-blur-sm rounded-2xl p-7 border shadow-xl hover:shadow-2xl transition-all duration-300`}
-    >
-      <div className="text-sm text-gray-400 font-medium mb-3 uppercase tracking-wider">
+      className={`rounded-2xl p-7 border transition-all duration-300 ${currentStyle.glowClass}`}
+      style={{
+        background: currentStyle.background,
+        borderColor: currentStyle.borderColor
+      }}
+>
+      <div 
+        className="text-xs uppercase tracking-wider font-medium mb-3"
+        style={{ color: '#94A3B8' }}
+>
         {label}
       </div>
-      <div className={`text-6xl font-mono font-bold ${textColor} mb-2 leading-none`}>
+      <div 
+        className="text-6xl font-mono font-bold mb-2 leading-none"
+        style={{ color: currentStyle.textColor }}>
         {displayValue.toFixed(2)}
       </div>
-      <div className="text-base text-gray-500 font-medium">{unit}</div>
+      <div className="text-base font-medium" style={{ color: '#94A3B8' }}>
+        {unit}
+      </div>
     </motion.div>
   );
 }

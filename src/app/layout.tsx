@@ -25,7 +25,7 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/favicon.ico" />
       </head>
-      <body className="antialiased bg-gray-900">
+      <body className="antialiased" style={{ background: '#0B1121' }}>
         {children}
       </body>
     </html>

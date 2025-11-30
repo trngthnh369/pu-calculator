@@ -17,35 +17,55 @@ export default function Header({
   showPresets 
 }: HeaderProps) {
   return (
-    <header className="border-b border-gray-800/50 backdrop-blur-sm sticky top-0 z-50 bg-gray-900/90 shadow-lg">
+    <header 
+      className="border-b backdrop-blur-sm sticky top-0 z-50"
+      style={{
+        background: 'rgba(11, 17, 33, 0.9)',
+        borderColor: '#2A3B55'
+      }}
+>
       <div className="container mx-auto px-6 py-5 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-11 h-11 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-xl flex items-center justify-center shadow-lg shadow-cyan-500/50">
-            <Calculator className="w-6 h-6" />
+          <div 
+            className="w-11 h-11 rounded-xl flex items-center justify-center glow-cyan"
+            style={{
+              background: 'linear-gradient(135deg, #00E5FF, #00B8D4)'
+            }}
+>
+            <Calculator className="w-6 h-6" style={{ color: '#0B1121' }} />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight">PU Calculator</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-white">PU Calculator</h1>
         </div>
         <div className="flex gap-3">
           <button
             onClick={onPresetsClick}
             className={`p-3 rounded-xl transition-all duration-200 ${
               showPresets 
-                ? 'bg-cyan-500/20 text-cyan-400 ring-2 ring-cyan-500/50' 
-                : 'hover:bg-gray-800/70 text-gray-400 hover:text-white'
+                ? 'glow-cyan' 
+                : ''
             }`}
+            style={{
+              background: showPresets ? 'rgba(0, 229, 255, 0.2)' : 'transparent',
+              color: showPresets ? '#00E5FF' : '#94A3B8',
+              border: showPresets ? '1px solid #00E5FF' : '1px solid transparent'
+            }}
             aria-label="Khuôn thường dùng"
-          >
+>
             <Package className="w-5 h-5" />
           </button>
           <button
             onClick={onSettingsClick}
             className={`p-3 rounded-xl transition-all duration-200 ${
               showSettings 
-                ? 'bg-cyan-500/20 text-cyan-400 ring-2 ring-cyan-500/50' 
-                : 'hover:bg-gray-800/70 text-gray-400 hover:text-white'
+                ? 'glow-cyan' 
+                : ''
             }`}
-            aria-label="Cài đặt"
-          >
+            style={{
+              background: showSettings ? 'rgba(0, 229, 255, 0.2)' : 'transparent',
+              color: showSettings ? '#00E5FF' : '#94A3B8',
+              border: showSettings ? '1px solid #00E5FF' : '1px solid transparent'
+            }}
+            aria-label="Cài đặt">
             <Settings className="w-5 h-5" />
           </button>
         </div>

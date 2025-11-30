@@ -22,6 +22,7 @@ export default function ParameterInputCard({
 }: ParameterInputCardProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [tempValue, setTempValue] = useState(value.toString());
+  const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
     setTempValue(value.toString());
@@ -37,21 +38,43 @@ export default function ParameterInputCard({
 
   return (
     <div className="flex-1 min-w-0">
-      <div className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50 h-full hover:border-gray-600/50 transition-all duration-300">
+      <div 
+        className="rounded-2xl p-6 border h-full transition-all duration-300"
+        style={{
+          background: '#151E32',
+          borderColor: isHovered ? '#00E5FF50' : '#2A3B55',
+          boxShadow: isHovered ? '0 0 15px rgba(0, 229, 255, 0.3)' : 'none'
+        }}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+>
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="text-cyan-400">{icon}</div>
-            <span className="text-sm text-gray-400 font-medium">{label}</span>
+            <div style={{ color: '#00E5FF' }}>{icon}</div>
+            <span className="text-xs uppercase tracking-wider font-medium" style={{ color: '#94A3B8' }}>
+              {label}
+            </span>
           </div>
           <button
             onClick={() => {
               setIsEditing(!isEditing);
               if (!isEditing) setTempValue(value.toString());
             }}
-            className="text-gray-500 hover:text-cyan-400 transition-colors p-1.5 rounded-lg hover:bg-gray-800/50"
-            aria-label="Chỉnh sửa"
-          >
+            className="p-1.5 rounded-lg transition-colors"
+            style={{
+              color: '#94A3B8',
+              background: 'transparent'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = '#00E5FF';
+              e.currentTarget.style.background = 'rgba(0, 229, 255, 0.1)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = '#94A3B8';
+              e.currentTarget.style.background = 'transparent';
+            }}
+            aria-label="Chỉnh sửa">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
             </svg>
@@ -75,15 +98,19 @@ export default function ParameterInputCard({
                   setTempValue(value.toString());
                 }
               }}
-              className="w-full bg-gray-900 text-white text-3xl font-mono font-bold px-4 py-3 rounded-xl border-2 border-cyan-500 focus:outline-none focus:ring-4 focus:ring-cyan-500/50 transition-all"
+              className="w-full text-white text-5xl font-mono font-bold px-4 py-3 rounded-xl border-2 focus:outline-none glow-cyan"
+              style={{
+                background: '#0B1121',
+                borderColor: '#00E5FF'
+              }}
               autoFocus
             />
           </div>
         ) : (
           <div className="mb-5">
-            <div className="text-4xl font-mono font-bold text-white leading-none">
+            <div className="text-5xl font-mono font-bold text-white leading-none">
               {value}
-              <span className="text-xl text-cyan-400 ml-2">{unit}</span>
+              <span className="text-2xl ml-2" style={{ color: '#00E5FF' }}>{unit}</span>
             </div>
           </div>
         )}

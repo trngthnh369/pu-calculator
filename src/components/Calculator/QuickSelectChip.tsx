@@ -16,11 +16,14 @@ export default function QuickSelectChip({ value, selected, onClick }: QuickSelec
       whileTap={{ scale: 0.95 }}
       onClick={onClick}
       className={`flex-shrink-0 px-4 py-2 rounded-full font-mono text-sm whitespace-nowrap transition-all duration-200 ${
-        selected
-          ? 'bg-cyan-500 text-white shadow-lg shadow-cyan-500/50 ring-2 ring-cyan-400'
-          : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white border border-gray-700 hover:border-gray-600'
+        selected ? 'glow-cyan' : ''
       }`}
-    >
+      style={{
+        background: selected ? '#00E5FF' : '#0F172A',
+        color: selected ? '#0B1121' : '#94A3B8',
+        border: selected ? 'none' : '1px solid #2A3B55',
+        fontWeight: selected ? 700 : 400
+      }}>
       {value}
     </motion.button>
   );
