@@ -12,7 +12,8 @@ export const SaddleIcon: React.FC<{ className?: string }> = ({ className = "w-6 
 );
 
 export const ThicknessIcon: React.FC<{ className?: string }> = ({ className = "w-5 h-5" }) => (
-  <div className={`h-1 bg-current rounded-full ${className}`} />
+  <div className={`w-5 h-2 bg-current`} />
+  
 );
 
 export const DiameterIcon: React.FC<{ className?: string }> = ({ className = "w-5 h-5" }) => (
@@ -20,5 +21,5 @@ export const DiameterIcon: React.FC<{ className?: string }> = ({ className = "w-
 );
 
 export const LengthIcon: React.FC<{ className?: string }> = ({ className = "w-5 h-5" }) => (
-  <div className={`h-2 bg-current ${className}`} />
+  <div className={`w-5 h-1 bg-current rounded-full`} />
 );

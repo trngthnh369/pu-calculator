@@ -20,7 +20,7 @@ export default function SettingsPanel({ show, density, onDensityChange }: Settin
           transition={{ duration: 0.3 }}
           className="border-b border-gray-800/50 bg-gray-900/50 backdrop-blur-sm overflow-hidden"
         >
-          <div className="container mx-auto px-6 py-6">
+          <div className="container mx-auto px-4 py-4">
             <label className="block text-sm text-gray-400 mb-3 font-medium">
               Tỷ trọng (kg/m³)
             </label>
@@ -34,7 +34,7 @@ export default function SettingsPanel({ show, density, onDensityChange }: Settin
               step="5"
             />
             <p className="text-xs text-gray-500 mt-3">
-              Mặc định: 150 kg/m³. Thường dùng: 120-200 kg/m³
+              Mặc định: 150 kg/m³.
             </p>
           </div>
         </motion.div>

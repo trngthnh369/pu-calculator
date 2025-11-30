@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import QuickSelectChip from './QuickSelectChip';
+import { ThicknessIcon, DiameterIcon, LengthIcon } from '@/components/ui/Icons';
 
 interface ParameterInputCardProps {
   label: string;
@@ -49,9 +50,18 @@ export default function ParameterInputCard({
         onMouseLeave={() => setIsHovered(false)}
 >
         {/* Header */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
-            <div style={{ color: '#00E5FF' }}>{icon}</div>
+            <div style={{ color: '#00E5FF' }}>
+              {(() => {
+                if (icon) return icon;
+                // Fallback mapping based on label
+                if (label === 'Độ dày') return <ThicknessIcon className="w-5 h-5" />;
+                if (label === 'Đường kính ngoài') return <DiameterIcon className="w-5 h-5" />;
+                if (label === 'Chiều dài') return <LengthIcon className="w-5 h-5" />;
+                return null;
+              })()}
+            </div>
             <span className="text-xs uppercase tracking-wider font-medium" style={{ color: '#94A3B8' }}>
               {label}
             </span>
@@ -74,7 +84,7 @@ export default function ParameterInputCard({
               e.currentTarget.style.color = '#94A3B8';
               e.currentTarget.style.background = 'transparent';
             }}
-            aria-label="Chỉnh sửa">
+            aria-label="Chỉnh sửa"  >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
             </svg>

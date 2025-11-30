@@ -13,7 +13,7 @@ interface SegmentedControlProps {
 export default function SegmentedControl({ value, onChange }: SegmentedControlProps) {
   return (
     <div 
-      className="relative flex rounded-full p-1.5 backdrop-blur-sm border"
+      className="relative flex bg-gray-800/50 rounded-full p-1 backdrop-blur-sm border border-gray-700/50"
       style={{
         background: '#0F172A',
         borderColor: '#2A3B55'
