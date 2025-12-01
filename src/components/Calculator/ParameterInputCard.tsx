@@ -117,7 +117,14 @@ export default function ParameterInputCard({
             />
           </div>
         ) : (
-          <div className="mb-[6%]">
+          <div
+            className="mb-[6%] cursor-pointer"
+            onClick={() => {
+              setIsEditing(true);
+              setTempValue(value.toString());
+            }}
+            aria-label="Chỉnh sửa giá trị"
+          >
             <div className="text-4xl font-mono font-bold text-white leading-none">
               {value}
               <span className="text-xl ml-2" style={{ color: '#00E5FF' }}>{unit}</span>

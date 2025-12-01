@@ -43,7 +43,7 @@ export default function SegmentedControl({ value, onChange }: SegmentedControlPr
         style={{
           color: value === 'circular' ? '#0B1121' : '#94A3B8'
         }}
-        aria-label="Khuôn tròn"
+        aria-label="Đế tròn"
       >
         <div className="flex items-center justify-center gap-2">
           <CircularIcon />
@@ -58,7 +58,7 @@ export default function SegmentedControl({ value, onChange }: SegmentedControlPr
         style={{
           color: value === 'saddle' ? '#0B1121' : '#94A3B8'
         }}
-        aria-label="Khuôn chữ U">
+        aria-label="Đế chữ U">
         <div className="flex items-center justify-center gap-2">
           <SaddleIcon />
           <span className="font-semibold text-base uppercase tracking-wide">Đế Chữ U</span>
