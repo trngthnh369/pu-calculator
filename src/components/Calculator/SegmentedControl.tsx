@@ -29,11 +29,10 @@ export default function SegmentedControl({ value, onChange }: SegmentedControlPr
         animate={{
           x: value === 'circular' ? '0%' : '100%',
         }}
-        transition={{ 
-          type: 'spring', 
-          stiffness: 350, 
-          damping: 30,
-          mass: 0.6
+        transition={{
+          type: 'tween',
+          duration: 0.15,
+          ease: [0.16, 1, 0.3, 1]
         }}
       />
       
@@ -48,7 +47,7 @@ export default function SegmentedControl({ value, onChange }: SegmentedControlPr
       >
         <div className="flex items-center justify-center gap-2">
           <CircularIcon />
-          <span className="font-semibold text-base uppercase tracking-wide">Khuôn Tròn</span>
+          <span className="font-semibold text-base uppercase tracking-wide">Đế Tròn</span>
         </div>
       </button>
       
@@ -62,7 +61,7 @@ export default function SegmentedControl({ value, onChange }: SegmentedControlPr
         aria-label="Khuôn chữ U">
         <div className="flex items-center justify-center gap-2">
           <SaddleIcon />
-          <span className="font-semibold text-base uppercase tracking-wide">Khuôn Chữ U</span>
+          <span className="font-semibold text-base uppercase tracking-wide">Đế Chữ U</span>
         </div>
       </button>
     </div>
