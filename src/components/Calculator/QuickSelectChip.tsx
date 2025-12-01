@@ -15,7 +15,7 @@ export default function QuickSelectChip({ value, selected, onClick }: QuickSelec
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
       onClick={onClick}
-      className={`shrink-0 px-4 py-2 rounded-full font-mono text-sm whitespace-nowrap transition-all duration-200 ${
+      className={`shrink-0 px-[4%] py-[1vh] rounded-full font-mono text-sm whitespace-nowrap transition-all duration-200 ${
         selected ? 'glow-cyan' : ''
       }`}
       style={{

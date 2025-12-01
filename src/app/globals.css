@@ -10,6 +10,7 @@ html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
+  height: 100%;
 }
 
 body {
@@ -19,6 +20,8 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background: #0B1121;
+  min-height: 100vh;
+  margin: 0;
 }
 
 .font-mono {
@@ -107,7 +110,7 @@ input[type="number"] {
 /* Mobile optimization */
 @media (max-width: 768px) {
   .container {
-    padding-left: 1rem !important;
-    padding-right: 1rem !important;
+    padding-left: 4vw !important;
+    padding-right: 4vw !important;
   }
 }

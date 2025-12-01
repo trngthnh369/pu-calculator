@@ -76,20 +76,20 @@ export default function ResultCard({ label, value, unit, color, valueClassName =
       initial="hidden"
       animate="visible"
       whileHover={{ scale: 1.02, y: -4, transition: { type: 'spring', stiffness: 300, damping: 20 } }}
-      className={`min-w-0 overflow-hidden rounded-2xl p-7 border transition-all duration-300 ${currentStyle.glowClass}`}
+      className={`min-w-0 overflow-hidden rounded-2xl border transition-all duration-300 px-[6%] py-[3vh] ${currentStyle.glowClass}`}
       style={{
         background: currentStyle.background,
         borderColor: currentStyle.borderColor
       }}
     >
       <div 
-        className="text-xs uppercase tracking-wider font-medium mb-3"
+        className="text-xs uppercase tracking-wider font-medium mb-[1.5vh]"
         style={{ color: '#94A3B8' }}
 >
         {label}
       </div>
       <div 
-        className={`${valueClassName} font-mono font-bold mb-2 leading-none wrap-break-word whitespace-normal`}
+        className={`${valueClassName} font-mono font-bold mb-[1vh] leading-none wrap-break-word whitespace-normal`}
         style={{ color: currentStyle.textColor }}>
         {displayValue.toFixed(2)}
       </div>

@@ -24,17 +24,19 @@ export default function Header({
         borderColor: '#2A3B55'
       }}
 >
-      <div className="container mx-auto px-6 py-5 flex items-center justify-between">
+      <div className="container mx-auto px-[5%] py-[2vh] flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div 
-            className="w-11 h-11 rounded-xl flex items-center justify-center glow-cyan"
+            className="w-[10vw] h-[10vw] max-w-[48px] max-h-[48px] rounded-xl flex items-center justify-center glow-cyan"
             style={{
               background: 'linear-gradient(135deg, #00E5FF, #00B8D4)'
             }}
 >
-            <Calculator className="w-6 h-6" style={{ color: '#0B1121' }} />
+            <Calculator className="w-[60%] h-[60%]" style={{ color: '#0B1121' }} />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">PU Calculator</h1>
+          <h1 className="text-[3.5vw] md:text-2xl font-bold tracking-tight text-white">
+            PU Calculator
+          </h1>
         </div>
         <div className="flex gap-3">
           <button

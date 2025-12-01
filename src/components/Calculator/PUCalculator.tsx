@@ -82,7 +82,7 @@ export default function PUCalculator() {
   const currentPresets = moldType === 'circular' ? CIRCULAR_PRESETS : SADDLE_PRESETS;
 
   return (
-    <div className="min-h-screen text-white overscroll-none" style={{ background: '#0B1121' }}>
+    <div className="min-h-screen flex flex-col text-white overscroll-none" style={{ background: '#0B1121' }}>
       {/* Header */}
       <Header
         onSettingsClick={() => setShowSettings(!showSettings)}
@@ -175,16 +175,16 @@ export default function PUCalculator() {
         onSelectPreset={loadPreset}
       />
 
-      {/* Main Content - Golden Ratio Layout */}
-      <div className="container mx-auto px-6 py-8">
-        <div className="flex flex-col lg:flex-row gap-6 min-h-0">
+      {/* Main Content - responsive layout, chiếm toàn bộ phần còn lại của màn hình */}
+      <div className="container mx-auto px-[5%] pt-[1.5vh] pb-[1.5vh] flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col lg:flex-row gap-[3%] min-h-0">
           {/* Input Area (full width now that inline results are removed) */}
-          <div className="flex-1 flex flex-col gap-6">
+          <div className="flex-1 flex flex-col gap-[3%]">
             {/* Mold Type Selector */}
             <SegmentedControl value={moldType} onChange={setMoldType} />
 
             {/* Parameter Inputs */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 flex-1">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-[2.5%] flex-1 py-[1vh]">
               <ParameterInputCard
                 label="Độ dày"
                 unit="mm"
@@ -216,7 +216,7 @@ export default function PUCalculator() {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={handleCalculate}
-              className="w-full py-6 rounded-full font-bold text-xl flex items-center justify-center gap-3 glow-cyan-strong"
+              className="w-full py-[2.5vh] rounded-full font-bold text-xl flex items-center justify-center gap-3 glow-cyan-strong"
               style={{
                 background: 'linear-gradient(to right, #00E5FF, #00B8D4)',
                 color: '#0B1121'
