@@ -23,6 +23,6 @@ export const SADDLE_PRESETS: Preset[] = [
 ];
 
 // Quick select options
-export const THICKNESS_OPTIONS = [20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100];
-export const OD_OPTIONS = [21, 27, 34, 42, 49, 60, 76, 89, 114, 140, 168, 219, 273, 324];
-export const LENGTH_OPTIONS = [50, 100, 150, 200, 250, 300, 400, 500, 600, 800, 1000, 1200];
+export const THICKNESS_OPTIONS = [25, 30, 40, 50];
+export const OD_OPTIONS = [21, 27, 34, 42, 49, 60.3, 76, 90];
+export const LENGTH_OPTIONS = [1200]; 

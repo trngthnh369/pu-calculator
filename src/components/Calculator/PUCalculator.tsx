@@ -25,9 +25,9 @@ import { ThicknessIcon, DiameterIcon, LengthIcon } from '@/components/ui/Icons';
 export default function PUCalculator() {
   // States
   const [moldType, setMoldType] = useState<MoldType>('circular');
-  const [thickness, setThickness] = useState(30);
-  const [outerDiameter, setOuterDiameter] = useState(42);
-  const [length, setLength] = useState(200);
+  const [thickness, setThickness] = useState(25);
+  const [outerDiameter, setOuterDiameter] = useState(21);
+  const [length, setLength] = useState(1200);
   const [density, setDensity] = useState(150);
   const [result, setResult] = useState<CalculationResult | null>(null);
   const [showSettings, setShowSettings] = useState(false);
