@@ -194,7 +194,7 @@ export default function PUCalculator() {
                 icon={<ThicknessIcon />}
               />
               <ParameterInputCard
-                label="Đường kính ngoài"
+                label="OD"
                 unit="mm"
                 value={outerDiameter}
                 options={OD_OPTIONS}
