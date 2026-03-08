@@ -1,158 +1,151 @@
 import { CalculationParams, CalculationResult } from './types';
+import { lookupReference } from './referenceData';
 
 /**
- * Calculate for circular mold (Khuôn đế tròn lõi tròn)
+ * Empirical density config derived from reverse-engineering reference data.
+ * 
+ * Analysis method: For each reference entry, compute:
+ *   empirical_density = polyKg / theoretical_volume
+ * Then group by moldType + OD range and average.
+ * 
+ * Results:
+ *   tron-small(≤50mm):   ~59 kg/m³
+ *   tron-med(51-100mm):  ~48 kg/m³
+ *   tron-large(101-200): ~46 kg/m³
+ *   tron-xlarge(>200):   ~47 kg/m³
+ *   vuong-small(≤50mm):  ~56 kg/m³
+ *   vuong-med(51-100mm): ~51 kg/m³
+ *   vuong-large(101-200):~42 kg/m³
+ *   vuong-xlarge(>200):  ~41 kg/m³
+ * 
+ * These effective densities capture all real-world factors:
+ * foam expansion, mold geometry, pouring technique, waste.
  */
-export function calculateCircular(params: CalculationParams): CalculationResult {
-  const { thickness, outerDiameter, length, density } = params;
-  
-  // Convert mm to m
-  const t_m = thickness / 1000;
-  const od_m = outerDiameter / 1000;
-  const l_m = length / 1000;
-  
-  // Calculate cushion outer diameter
-  const cushionOD = od_m + (2 * t_m);
-  
-  // Calculate area (m²)
-  const area = ((Math.PI / 4) * (Math.pow(cushionOD, 2) - Math.pow(od_m, 2)) / 2);
-  
-  // Calculate volume (m³)
-  const volume = area * l_m;
-  
-  // Calculate finished mass (kg)
-  const finishedMass = volume * density;
-  
-  // Calculate required mass with 20% loss factor
-  const requiredMass = finishedMass * 0.8;
-  
-  // Calculate polyol and isocyanate (ratio 1.0:1.2)
-  const polyol = (requiredMass / 2.2) * 1.0;
-  const isocyanate = (requiredMass / 2.2) * 1.2;
-  
-  return {
-    area: parseFloat(area.toFixed(4)),
-    volume: parseFloat(volume.toFixed(5)),
-    finishedMass: parseFloat(finishedMass.toFixed(2)),
-    requiredMass: parseFloat(requiredMass.toFixed(2)),
-    polyol: parseFloat(polyol.toFixed(2)),
-    isocyanate: parseFloat(isocyanate.toFixed(2))
-  };
+interface SmartDensityConfig {
+  effectiveDensity: number;  // kg/m³ - already includes all factors
+  description: string;
 }
 
-// --- 1. Định nghĩa Type cho cấu hình động ---
-type SmartConfig = {
-  appliedDensity: number; // Tỷ trọng áp dụng (kg/m3)
-  wasteRate: number;      // Tỷ lệ hao hụt (0.25 = 25%)
-  description: string;    // Mô tả nhóm
-};
-
-/**
- * Hàm phụ trợ: Xác định Tỷ trọng & Hao hụt dựa trên OD ống
- * Logic: Khuôn nhỏ nén chặt + hao hụt cao. Khuôn lớn nén vừa + hao hụt thấp.
- */
-function getSmartConfig(od_mm: number): SmartConfig {
-  if (od_mm < 130) {
-    // Nhóm OD 114 (Khớp dữ liệu 2.64kg)
-    return { 
-      appliedDensity: 220, 
-      wasteRate: 0, // 25%
-      description: "Khuôn Nhỏ (Nén cao)" 
-    };
-  } 
-  else if (od_mm <= 200) {
-    // Nhóm OD 141, 168 (Khớp dữ liệu 4.4kg, 5.5kg)
-    return { 
-      appliedDensity: 180, 
-      wasteRate: 0, // 15%
-      description: "Khuôn Trung (Tiêu chuẩn)" 
-    };
-  } 
-  else {
-    // Nhóm OD 219 (Khớp dữ liệu 6.6kg)
-    return { 
-      appliedDensity: 172, 
-      wasteRate: 0, // 10%
-      description: "Khuôn Lớn (Tiết kiệm)" 
-    };
+function getSmartDensity(moldType: 'tron' | 'vuong', od_mm: number): SmartDensityConfig {
+  if (moldType === 'tron') {
+    if (od_mm <= 50) {
+      return { effectiveDensity: 59, description: 'Ống nhỏ (≤50mm) - Nén cao' };
+    } else if (od_mm <= 100) {
+      return { effectiveDensity: 48, description: 'Ống vừa (51-100mm)' };
+    } else if (od_mm <= 200) {
+      return { effectiveDensity: 46, description: 'Ống lớn (101-200mm)' };
+    } else {
+      return { effectiveDensity: 47, description: 'Ống rất lớn (>200mm)' };
+    }
+  } else {
+    // vuong
+    if (od_mm <= 50) {
+      return { effectiveDensity: 56, description: 'Ống nhỏ (≤50mm) - Nén cao' };
+    } else if (od_mm <= 100) {
+      return { effectiveDensity: 51, description: 'Ống vừa (51-100mm)' };
+    } else if (od_mm <= 200) {
+      return { effectiveDensity: 42, description: 'Ống lớn (101-200mm)' };
+    } else {
+      return { effectiveDensity: 41, description: 'Ống rất lớn (>200mm)' };
+    }
   }
 }
 
 /**
- * Calculate for HALF-SQUARE mold (Khuôn đế U - Nửa đế vuông)
- * Logic: "Thực tế sản xuất" (Real-world Logic)
+ * Calculate volume for round (Tròn) mold
+ * Formula: V = π × ((OD/2 + T)² - (OD/2)²) × L
  */
-export function calculateSaddle(params: CalculationParams): CalculationResult {
-  // Lưu ý: Ta không dùng tham số 'density' truyền vào, mà dùng logic tự động
-  const { thickness, outerDiameter, length } = params;
-  
-  // Validate input 
-  if (!thickness || !outerDiameter || !length) {
-    return {
-      area: 0, volume: 0, finishedMass: 0, requiredMass: 0, polyol: 0, isocyanate: 0
-    };
-  }
-
-  // 1. Lấy cấu hình động (Tỷ trọng & Hao hụt)
-  const config = getSmartConfig(outerDiameter);
-
-  // 2. Chuyển đổi đơn vị (mm -> m)
-  const t_m = thickness / 1000;
-  const od_pipe_m = outerDiameter / 1000;
-  const l_m = length / 1000;
-  
-  // 3. Tính toán Hình học (Nửa đế vuông)
-  // 
-  
-  // Cạnh hình vuông bao ngoài
-  const squareSide = od_pipe_m + (2 * t_m);
-  
-  // Diện tích Hình vuông Đặc (Full Square)
-  const areaOuterSquare = Math.pow(squareSide, 2);
-  
-  // Diện tích Lỗ tròn (Hole)
-  const areaHole = (Math.PI / 4) * Math.pow(od_pipe_m, 2);
-
-  // Diện tích Vật liệu = (Vuông Đặc - Lỗ) / 2
-  // CHÚ Ý: Phải chia 2 vì đây là Nửa đế vuông (Saddle Base)
-  const areaFinal = (areaOuterSquare - areaHole) / 2;
-  
-  // 4. Tính Thể tích (m³)
-  const volume = areaFinal * l_m;
-  
-  // 5. Tính Khối lượng Thành phẩm (Net Weight)
-  // Dùng tỷ trọng động (220, 180 hoặc 172) thay vì số cố định
-  const finishedMass = volume * config.appliedDensity;
-  
-  // 6. Tính Tổng hóa chất cần pha (Gross Weight)
-  // Hao hụt là CỘNG THÊM (1 + wasteRate). Ví dụ 25% -> nhân 1.25
-  const requiredMass = finishedMass * (1 + config.wasteRate);
-  
-  // 7. Chia thành phần Poly/Iso (Tỷ lệ 1.0 : 1.2)
-  const totalRatio = 2.2;
-  const polyol = (requiredMass / totalRatio) * 1.0;
-  const isocyanate = (requiredMass / totalRatio) * 1.2;
-  
-  // Trả về kết quả (Làm tròn số cho đẹp)
-  return {
-    area: parseFloat(areaFinal.toFixed(5)),
-    volume: parseFloat(volume.toFixed(5)),
-    finishedMass: parseFloat(finishedMass.toFixed(2)), // Khớp với số liệu KCS
-    requiredMass: parseFloat(requiredMass.toFixed(2)), // Khớp với số liệu Pha chế
-    polyol: parseFloat(polyol.toFixed(2)),
-    isocyanate: parseFloat(isocyanate.toFixed(2)),
-    // Trả thêm thông tin cấu hình để hiển thị UI nếu cần
-    // _config: config 
-  };
+function calculateVolumeRound(od_mm: number, thickness_mm: number, length_mm: number): number {
+  const innerR = od_mm / 2;
+  const outerR = innerR + thickness_mm;
+  const innerR_m = innerR / 1000;
+  const outerR_m = outerR / 1000;
+  const length_m = length_mm / 1000;
+  return Math.PI * (outerR_m * outerR_m - innerR_m * innerR_m) * length_m;
 }
 
 /**
- * Main calculation function that routes to appropriate calculator
+ * Calculate volume for square (Vuông) mold
+ * Formula: V = ((OD + 2T)² - π × (OD/2)²) × L
+ */
+function calculateVolumeSquare(od_mm: number, thickness_mm: number, length_mm: number): number {
+  const squareSide_m = (od_mm + 2 * thickness_mm) / 1000;
+  const holeRadius_m = (od_mm / 2) / 1000;
+  const length_m = length_mm / 1000;
+  return (squareSide_m * squareSide_m - Math.PI * holeRadius_m * holeRadius_m) * length_m;
+}
+
+/**
+ * Main calculation function
+ * Strategy: Lookup-first, Calculate-fallback with smart density
+ * 
+ * 1. Exact match in reference data → "Tra bảng" (use real production values)
+ * 2. No match → calculate with empirical density per mold type + OD range → "Tính toán"
+ * 3. Apply loss rate on top of result
+ * 
+ * When using manual density (user override), the user's density is used directly.
+ * When using auto density (default), the empirical density from reference data analysis is used.
  */
 export function calculate(params: CalculationParams): CalculationResult {
-  if (params.moldType === 'circular') {
-    return calculateCircular(params);
-  } else {
-    return calculateSaddle(params);
+  const { moldType, outerDiameter, thickness, length, density, lossRate, useAutoDensity } = params;
+  
+  // 1. Try exact match lookup
+  const refEntry = lookupReference(moldType, outerDiameter, thickness, length);
+  
+  if (refEntry) {
+    const basePoly = refEntry.polyKg;
+    const baseIso = refEntry.isoKg;
+    const polyol = basePoly * (1 + lossRate);
+    const isocyanate = baseIso * (1 + lossRate);
+    
+    const volume = moldType === 'tron'
+      ? calculateVolumeRound(outerDiameter, thickness, length)
+      : calculateVolumeSquare(outerDiameter, thickness, length);
+    
+    return {
+      polyol: parseFloat(polyol.toFixed(2)),
+      isocyanate: parseFloat(isocyanate.toFixed(2)),
+      volume: parseFloat(volume.toFixed(6)),
+      calculationMethod: 'lookup',
+      basePoly,
+      baseIso,
+      appliedDensity: parseFloat((basePoly / volume).toFixed(1)),
+      densitySource: 'reference',
+    };
   }
+  
+  // 2. No match → Calculate from formula
+  const volume = moldType === 'tron'
+    ? calculateVolumeRound(outerDiameter, thickness, length)
+    : calculateVolumeSquare(outerDiameter, thickness, length);
+  
+  // Use smart density (auto) or manual density
+  let appliedDensity: number;
+  let densitySource: 'auto' | 'manual';
+  
+  if (useAutoDensity) {
+    const config = getSmartDensity(moldType, outerDiameter);
+    appliedDensity = config.effectiveDensity;
+    densitySource = 'auto';
+  } else {
+    appliedDensity = density;
+    densitySource = 'manual';
+  }
+  
+  const basePoly = volume * appliedDensity;
+  const baseIso = basePoly * 1.2;
+  
+  const polyol = basePoly * (1 + lossRate);
+  const isocyanate = baseIso * (1 + lossRate);
+  
+  return {
+    polyol: parseFloat(polyol.toFixed(2)),
+    isocyanate: parseFloat(isocyanate.toFixed(2)),
+    volume: parseFloat(volume.toFixed(6)),
+    calculationMethod: 'calculated',
+    basePoly: parseFloat(basePoly.toFixed(2)),
+    baseIso: parseFloat(baseIso.toFixed(2)),
+    appliedDensity,
+    densitySource,
+  };
 }

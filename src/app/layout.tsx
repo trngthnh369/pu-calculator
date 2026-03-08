@@ -3,10 +3,10 @@ import "./globals.css";
 import Script from "next/script";
 
 export const metadata: Metadata = {
-  title: "PU Calculator - Tính Toán Polyurethane",
-  description: "Ứng dụng tính toán chính xác lượng hóa chất Polyurethane trong sản xuất gối đỡ (pipe support)",
-  keywords: "polyurethane, PU calculator, pipe support, gối đỡ, tính toán hóa chất",
-  authors: [{ name: "PU Calculator Team" }],
+  title: "PU Calculator - Tính Toán Khối Lượng Poly & ISO",
+  description: "Ứng dụng tính toán chính xác khối lượng Polyol & Isocyanate cho khuôn gối PU (Polyurethane). Hỗ trợ khuôn tròn và vuông, tra bảng dữ liệu thực tế.",
+  keywords: "polyurethane, PU calculator, Poly ISO, khuôn gối PU, pipe support, tính toán hóa chất, gối đỡ ống",
+  authors: [{ name: "PU Calculator" }],
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -19,7 +19,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
-  themeColor: "#00E5FF",
+  themeColor: "#5e19e6",
 };
 
 export default function RootLayout({
@@ -35,7 +35,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       </head>
-      <body className="antialiased" style={{ background: '#0B1121' }}>
+      <body className="antialiased" style={{ background: '#0a0a0f' }}>
         {children}
         
         {/* Service Worker Registration */}

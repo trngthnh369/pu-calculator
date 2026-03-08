@@ -1,6 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap");
 
-@import 'tailwindcss';
+@import "tailwindcss";
 
 * {
   box-sizing: border-box;
@@ -14,37 +14,42 @@ body {
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  font-family:
+    "Space Grotesk",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "Roboto",
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #0B1121;
+  background: #0a0a0f;
   min-height: 100vh;
   margin: 0;
+  color: #e2e8f0;
 }
 
 .font-mono {
-  font-family: 'JetBrains Mono', 'Consolas', 'Monaco', 'Roboto Mono', monospace;
+  font-family: "JetBrains Mono", "Consolas", "Monaco", monospace;
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0B1121;
+  background: #0a0a0f;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #2A3B55;
-  border-radius: 4px;
+  background: #2d2d4a;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #00E5FF;
+  background: #5e19e6;
 }
 
 /* Hide scrollbar for horizontal scroll */
@@ -57,13 +62,6 @@ body {
   scrollbar-width: none;
 }
 
-/* Smooth transitions */
-* {
-  transition-property: background-color, border-color, color, fill, stroke, transform, box-shadow;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 200ms;
-}
-
 /* Remove default button styles */
 button {
   -webkit-tap-highlight-color: transparent;
@@ -72,9 +70,6 @@ button {
 /* Prevent text selection on buttons */
 button,
 .no-select {
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
   user-select: none;
 }
 
@@ -90,27 +85,173 @@ input[type="number"] {
   appearance: none;
 }
 
-/* Neon Glow Effects */
-.glow-cyan {
-  box-shadow: 0 0 15px rgba(0, 229, 255, 0.5);
+/* ===== Glow Effects ===== */
+.glow-purple {
+  box-shadow: 0 0 20px rgba(94, 25, 230, 0.4);
 }
 
-.glow-cyan-strong {
-  box-shadow: 0 0 30px rgba(0, 229, 255, 0.6), 0 0 60px rgba(0, 229, 255, 0.3);
+.glow-purple-strong {
+  box-shadow:
+    0 0 30px rgba(94, 25, 230, 0.5),
+    0 0 60px rgba(94, 25, 230, 0.2);
 }
 
-.glow-yellow {
-  box-shadow: 0 0 15px rgba(255, 214, 0, 0.5);
+.glow-gold {
+  box-shadow: 0 0 20px rgba(232, 213, 163, 0.3);
 }
 
-.glow-yellow-strong {
-  box-shadow: 0 0 30px rgba(255, 214, 0, 0.6), 0 0 60px rgba(255, 214, 0, 0.3);
+.glow-gold-strong {
+  box-shadow:
+    0 0 30px rgba(232, 213, 163, 0.4),
+    0 0 60px rgba(232, 213, 163, 0.15);
 }
 
-/* Mobile optimization */
+/* ===== Glassmorphism ===== */
+.glass {
+  background: rgba(26, 26, 46, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(45, 45, 74, 0.5);
+}
+
+.glass-strong {
+  background: rgba(26, 26, 46, 0.8);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(45, 45, 74, 0.7);
+}
+
+/* ===== Surface Cards ===== */
+.surface {
+  background: #1a1a2e;
+  border: 1px solid #2d2d4a;
+}
+
+.surface-hover {
+  transition: all 0.2s ease;
+}
+
+.surface-hover:hover {
+  border-color: rgba(94, 25, 230, 0.5);
+  box-shadow: 0 0 20px rgba(94, 25, 230, 0.15);
+}
+
+/* ===== Custom Range Slider ===== */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: #2d2d4a;
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #5e19e6;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(94, 25, 230, 0.5);
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 15px rgba(94, 25, 230, 0.7);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #5e19e6;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 0 10px rgba(94, 25, 230, 0.5);
+}
+
+/* ===== Gradient Button ===== */
+.btn-primary {
+  background: linear-gradient(135deg, #5e19e6, #7c3aed);
+  color: #fff;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  box-shadow:
+    0 0 30px rgba(94, 25, 230, 0.5),
+    0 0 60px rgba(94, 25, 230, 0.2);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* ===== Badge ===== */
+.badge-lookup {
+  background: rgba(46, 213, 115, 0.15);
+  color: #2ed573;
+  border: 1px solid rgba(46, 213, 115, 0.3);
+}
+
+.badge-calculated {
+  background: rgba(232, 213, 163, 0.15);
+  color: #e8d5a3;
+  border: 1px solid rgba(232, 213, 163, 0.3);
+}
+
+/* ===== Mobile optimization ===== */
 @media (max-width: 768px) {
   .container {
     padding-left: 4vw !important;
     padding-right: 4vw !important;
   }
+}
+
+/* ===== Custom Select ===== */
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235e19e6' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  padding-right: 36px;
+}
+
+/* ===== Table ===== */
+.ref-table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.ref-table thead th {
+  background: #12121f;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: 2px solid #2d2d4a;
+}
+
+.ref-table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.ref-table tbody tr:hover {
+  background-color: rgba(94, 25, 230, 0.08);
+}
+
+.ref-table tbody tr.highlighted {
+  background-color: rgba(94, 25, 230, 0.15);
+  border-left: 3px solid #5e19e6;
 }

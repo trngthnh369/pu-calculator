@@ -2,33 +2,26 @@
  * Type definitions for PU Calculator
  */
 
-export type MoldType = 'circular' | 'saddle';
+export type MoldType = 'tron' | 'vuong';
 
 export interface CalculationParams {
   moldType: MoldType;
+  dn?: string;            // DN pipe size, e.g. 'DN50'
+  outerDiameter: number;  // mm (OD)
   thickness: number;      // mm
-  outerDiameter: number;  // mm
   length: number;         // mm
-  density: number;        // kg/m³
+  density: number;        // kg/m³ (manual density, used when useAutoDensity=false)
+  lossRate: number;       // 0-1 range (e.g. 0.1 = 10%)
+  useAutoDensity: boolean; // true = use smart density from reference data analysis
 }
 
 export interface CalculationResult {
-  area: number;          // m² - 4 decimal places
-  volume: number;        // m³ - 5 decimal places
-  finishedMass: number;  // kg - 2 decimal places
-  requiredMass: number;  // kg - 2 decimal places
-  polyol: number;        // kg - 2 decimal places
-  isocyanate: number;    // kg - 2 decimal places
-}
-
-export interface Preset {
-  name: string;
-  thickness: number;
-  outerDiameter: number;
-  length: number;
-}
-
-export interface PresetCategory {
-  circular: Preset[];
-  saddle: Preset[];
+  polyol: number;          // kg (after loss rate)
+  isocyanate: number;      // kg (after loss rate)
+  volume: number;          // m³
+  calculationMethod: 'lookup' | 'calculated';
+  basePoly: number;        // kg (before loss rate)
+  baseIso: number;         // kg (before loss rate)
+  appliedDensity: number;  // kg/m³ - actual density used
+  densitySource: 'reference' | 'auto' | 'manual';
 }
