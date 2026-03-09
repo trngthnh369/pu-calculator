@@ -2,64 +2,63 @@ import { CalculationParams, CalculationResult } from './types';
 import { lookupReference } from './referenceData';
 
 /**
- * Empirical density config derived from reverse-engineering reference data.
+ * Smart density config derived from reverse-engineering reference data.
  * 
- * Analysis method: For each reference entry, compute:
- *   empirical_density = polyKg / theoretical_volume
- * Then group by moldType + OD range and average.
+ * IMPORTANT: These are TOTAL PU foam densities (Poly + ISO combined).
+ * Formula: Total_weight = Volume × density
+ *          Poly = Total / 2.2  (ratio Poly:ISO = 1:1.2)
+ *          ISO  = Poly × 1.2
  * 
- * Results:
- *   tron-small(≤50mm):   ~59 kg/m³
- *   tron-med(51-100mm):  ~48 kg/m³
- *   tron-large(101-200): ~46 kg/m³
- *   tron-xlarge(>200):   ~47 kg/m³
- *   vuong-small(≤50mm):  ~56 kg/m³
- *   vuong-med(51-100mm): ~51 kg/m³
- *   vuong-large(101-200):~42 kg/m³
- *   vuong-xlarge(>200):  ~41 kg/m³
- * 
- * These effective densities capture all real-world factors:
- * foam expansion, mold geometry, pouring technique, waste.
+ * Empirical total densities by mold type + OD range:
+ *   tron-small(≤50mm):   ~130 kg/m³
+ *   tron-med(51-100mm):  ~105 kg/m³
+ *   tron-large(101-200): ~102 kg/m³
+ *   tron-xlarge(>200):   ~103 kg/m³
+ *   vuong-small(≤50mm):  ~124 kg/m³
+ *   vuong-med(51-100mm): ~112 kg/m³
+ *   vuong-large(101-200):~92 kg/m³
+ *   vuong-xlarge(>200):  ~90 kg/m³
  */
 interface SmartDensityConfig {
-  effectiveDensity: number;  // kg/m³ - already includes all factors
+  effectiveDensity: number;  // kg/m³ total PU foam density
   description: string;
 }
 
 function getSmartDensity(moldType: 'tron' | 'vuong', od_mm: number): SmartDensityConfig {
   if (moldType === 'tron') {
     if (od_mm <= 50) {
-      return { effectiveDensity: 59, description: 'Ống nhỏ (≤50mm) - Nén cao' };
+      return { effectiveDensity: 130, description: 'Ống nhỏ (≤50mm) - Nén cao' };
     } else if (od_mm <= 100) {
-      return { effectiveDensity: 48, description: 'Ống vừa (51-100mm)' };
+      return { effectiveDensity: 105, description: 'Ống vừa (51-100mm)' };
     } else if (od_mm <= 200) {
-      return { effectiveDensity: 46, description: 'Ống lớn (101-200mm)' };
+      return { effectiveDensity: 102, description: 'Ống lớn (101-200mm)' };
     } else {
-      return { effectiveDensity: 47, description: 'Ống rất lớn (>200mm)' };
+      return { effectiveDensity: 103, description: 'Ống rất lớn (>200mm)' };
     }
   } else {
     // vuong
     if (od_mm <= 50) {
-      return { effectiveDensity: 56, description: 'Ống nhỏ (≤50mm) - Nén cao' };
+      return { effectiveDensity: 124, description: 'Ống nhỏ (≤50mm) - Nén cao' };
     } else if (od_mm <= 100) {
-      return { effectiveDensity: 51, description: 'Ống vừa (51-100mm)' };
+      return { effectiveDensity: 112, description: 'Ống vừa (51-100mm)' };
     } else if (od_mm <= 200) {
-      return { effectiveDensity: 42, description: 'Ống lớn (101-200mm)' };
+      return { effectiveDensity: 92, description: 'Ống lớn (101-200mm)' };
     } else {
-      return { effectiveDensity: 41, description: 'Ống rất lớn (>200mm)' };
+      return { effectiveDensity: 90, description: 'Ống rất lớn (>200mm)' };
     }
   }
 }
+
+// Poly:ISO weight ratio = 1:1.2, so total factor = 1 + 1.2 = 2.2
+const POLY_ISO_TOTAL_FACTOR = 2.2;
 
 /**
  * Calculate volume for round (Tròn) mold
  * Formula: V = π × ((OD/2 + T)² - (OD/2)²) × L
  */
 function calculateVolumeRound(od_mm: number, thickness_mm: number, length_mm: number): number {
-  const innerR = od_mm / 2;
-  const outerR = innerR + thickness_mm;
-  const innerR_m = innerR / 1000;
-  const outerR_m = outerR / 1000;
+  const innerR_m = (od_mm / 2) / 1000;
+  const outerR_m = (od_mm / 2 + thickness_mm) / 1000;
   const length_m = length_mm / 1000;
   return Math.PI * (outerR_m * outerR_m - innerR_m * innerR_m) * length_m;
 }
@@ -79,15 +78,22 @@ function calculateVolumeSquare(od_mm: number, thickness_mm: number, length_mm: n
  * Main calculation function
  * Strategy: Lookup-first, Calculate-fallback with smart density
  * 
- * 1. Exact match in reference data → "Tra bảng" (use real production values)
- * 2. No match → calculate with empirical density per mold type + OD range → "Tính toán"
- * 3. Apply loss rate on top of result
+ * 1. Exact match → use reference data directly ("Tra bảng")
+ * 2. No match → calculate using volume × density → split by ratio ("Tính toán")
+ * 3. Apply loss rate on final result
  * 
- * When using manual density (user override), the user's density is used directly.
- * When using auto density (default), the empirical density from reference data analysis is used.
+ * CRITICAL: density = total PU foam density (Poly + ISO combined)
+ *   Total = Volume × density
+ *   Poly  = Total / 2.2  (because Poly:ISO = 1:1.2, total factor = 2.2)
+ *   ISO   = Poly × 1.2
  */
 export function calculate(params: CalculationParams): CalculationResult {
   const { moldType, outerDiameter, thickness, length, density, lossRate, useAutoDensity } = params;
+  
+  // Always calculate volume for display
+  const volume = moldType === 'tron'
+    ? calculateVolumeRound(outerDiameter, thickness, length)
+    : calculateVolumeSquare(outerDiameter, thickness, length);
   
   // 1. Try exact match lookup
   const refEntry = lookupReference(moldType, outerDiameter, thickness, length);
@@ -98,10 +104,6 @@ export function calculate(params: CalculationParams): CalculationResult {
     const polyol = basePoly * (1 + lossRate);
     const isocyanate = baseIso * (1 + lossRate);
     
-    const volume = moldType === 'tron'
-      ? calculateVolumeRound(outerDiameter, thickness, length)
-      : calculateVolumeSquare(outerDiameter, thickness, length);
-    
     return {
       polyol: parseFloat(polyol.toFixed(2)),
       isocyanate: parseFloat(isocyanate.toFixed(2)),
@@ -109,17 +111,13 @@ export function calculate(params: CalculationParams): CalculationResult {
       calculationMethod: 'lookup',
       basePoly,
       baseIso,
-      appliedDensity: parseFloat((basePoly / volume).toFixed(1)),
+      appliedDensity: parseFloat(((basePoly + baseIso) / volume).toFixed(1)),
       densitySource: 'reference',
     };
   }
   
   // 2. No match → Calculate from formula
-  const volume = moldType === 'tron'
-    ? calculateVolumeRound(outerDiameter, thickness, length)
-    : calculateVolumeSquare(outerDiameter, thickness, length);
-  
-  // Use smart density (auto) or manual density
+  // Determine which density to use
   let appliedDensity: number;
   let densitySource: 'auto' | 'manual';
   
@@ -132,7 +130,12 @@ export function calculate(params: CalculationParams): CalculationResult {
     densitySource = 'manual';
   }
   
-  const basePoly = volume * appliedDensity;
+  // CORRECT FORMULA:
+  // density is TOTAL PU foam density (Poly + ISO combined)
+  // Total weight = Volume × density
+  // Then split by ratio: Poly = Total / 2.2, ISO = Poly × 1.2
+  const totalWeight = volume * appliedDensity;
+  const basePoly = totalWeight / POLY_ISO_TOTAL_FACTOR;
   const baseIso = basePoly * 1.2;
   
   const polyol = basePoly * (1 + lossRate);
