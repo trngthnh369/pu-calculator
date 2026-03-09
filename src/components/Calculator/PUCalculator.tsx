@@ -21,8 +21,7 @@ export default function PUCalculator() {
   const [thickness, setThickness] = useState(50);
   const [length, setLength] = useState(1200);
   const [density, setDensity] = useState(150);
-  const [lossRate, setLossRate] = useState(0); // 0-100 display, stored as 0-1
-  const [useAutoDensity, setUseAutoDensity] = useState(true);
+  const [lossRate, setLossRate] = useState(0);
 
   // Result state
   const [result, setResult] = useState<CalculationResult | null>(null);
@@ -70,7 +69,6 @@ export default function PUCalculator() {
       length,
       density,
       lossRate: lossRate / 100,
-      useAutoDensity,
     };
     const calcResult = calculate(params);
     setResult(calcResult);
@@ -81,7 +79,7 @@ export default function PUCalculator() {
         document.getElementById('results-section')?.scrollIntoView({ behavior: 'smooth' });
       }, 100);
     }
-  }, [moldType, selectedDN, outerDiameter, thickness, length, density, lossRate, useAutoDensity]);
+  }, [moldType, selectedDN, outerDiameter, thickness, length, density, lossRate]);
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: '#0a0a0f' }}>
@@ -224,55 +222,31 @@ export default function PUCalculator() {
                     className="overflow-hidden"
                   >
                     <div className="px-4 pb-4 space-y-4 border-t" style={{ borderColor: '#2d2d4a' }}>
-                      {/* Auto Density Toggle */}
-                      <div className="flex items-center justify-between pt-3">
-                        <div>
+                      {/* Density Slider */}
+                      <div className="space-y-2 pt-3">
+                        <div className="flex justify-between items-center">
                           <label className="text-xs uppercase tracking-wider font-medium" style={{ color: '#94A3B8' }}>
-                            Tỉ trọng tự động
+                            Tỉ trọng PU
                           </label>
-                          <p className="text-xs mt-0.5" style={{ color: '#64748b' }}>
-                            Dùng tỉ trọng thực nghiệm theo loại khuôn + OD
-                          </p>
+                          <span className="text-sm font-mono font-semibold" style={{ color: '#5e19e6' }}>
+                            {density} kg/m³
+                          </span>
                         </div>
-                        <button
-                          onClick={() => { setUseAutoDensity(!useAutoDensity); setResult(null); }}
-                          className="relative w-12 h-6 rounded-full transition-colors"
-                          style={{ background: useAutoDensity ? '#5e19e6' : '#2d2d4a' }}
-                        >
-                          <div
-                            className="absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform"
-                            style={{ left: useAutoDensity ? '26px' : '2px' }}
-                          />
-                        </button>
+                        <input
+                          type="range"
+                          min="80"
+                          max="250"
+                          step="5"
+                          value={density}
+                          onChange={(e) => { setDensity(parseInt(e.target.value)); setResult(null); }}
+                          className="w-full"
+                        />
+                        <div className="flex justify-between text-xs" style={{ color: '#64748b' }}>
+                          <span>80</span>
+                          <span>Mặc định: 150 kg/m³</span>
+                          <span>250</span>
+                        </div>
                       </div>
-
-                      {/* Manual Density Slider (only when auto is OFF) */}
-                      {!useAutoDensity && (
-                        <div className="space-y-2">
-                          <div className="flex justify-between items-center">
-                            <label className="text-xs uppercase tracking-wider font-medium" style={{ color: '#94A3B8' }}>
-                              Tỉ trọng thủ công
-                            </label>
-                            <span className="text-sm font-mono font-semibold" style={{ color: '#5e19e6' }}>
-                              {density} kg/m³
-                            </span>
-                          </div>
-                          <input
-                            type="range"
-                            min="30"
-                            max="250"
-                            step="1"
-                            value={density}
-                            onChange={(e) => { setDensity(parseInt(e.target.value)); setResult(null); }}
-                            className="w-full"
-                          />
-                          <div className="flex justify-between text-xs" style={{ color: '#64748b' }}>
-                            <span>30</span>
-                            <span>Mặc định: 150 kg/m³</span>
-                            <span>250</span>
-                          </div>
-                        </div>
-                      )}
 
                       {/* Loss Rate */}
                       <div className="space-y-2">
@@ -374,12 +348,12 @@ export default function PUCalculator() {
                       </div>
                     </div>
                     <div className="surface rounded-xl p-3">
-                      <div className="text-xs uppercase tracking-wider mb-1" style={{ color: '#64748b' }}>Tỉ trọng</div>
+                      <div className="text-xs uppercase tracking-wider mb-1" style={{ color: '#64748b' }}>Hệ số K</div>
                       <div className="font-mono text-sm font-semibold text-white">
-                        {result.appliedDensity} kg/m³
+                        {result.kCoefficient.toFixed(2)}
                       </div>
                       <div className="text-xs mt-0.5" style={{ color: '#64748b' }}>
-                        {result.densitySource === 'reference' ? '📊 Từ bảng' : result.densitySource === 'auto' ? '🤖 Tự động' : '✏️ Thủ công'}
+                        Poly = V×{density}/K
                       </div>
                     </div>
                     <div className="surface rounded-xl p-3">
@@ -403,7 +377,8 @@ export default function PUCalculator() {
                       <span>{selectedDN} <b className="text-white">OD {outerDiameter}mm</b></span>
                       <span>Dày: <b className="text-white">{thickness}mm</b></span>
                       <span>Dài: <b className="text-white">{length}mm</b></span>
-                      <span>Tỉ trọng: <b className="text-white">{result.appliedDensity} kg/m³</b> <span style={{ color: '#64748b' }}>({result.densitySource === 'reference' ? 'bảng' : result.densitySource === 'auto' ? 'tự động' : 'thủ công'})</span></span>
+                      <span>Tỉ trọng: <b className="text-white">{density} kg/m³</b></span>
+                      <span>K: <b className="text-white">{result.kCoefficient.toFixed(2)}</b></span>
                     </div>
                   </div>
                 </motion.div>

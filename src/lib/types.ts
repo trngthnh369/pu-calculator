@@ -10,9 +10,8 @@ export interface CalculationParams {
   outerDiameter: number;  // mm (OD)
   thickness: number;      // mm
   length: number;         // mm
-  density: number;        // kg/m³ (manual density, used when useAutoDensity=false)
+  density: number;        // kg/m³ - tỉ trọng PU foam (mặc định 150)
   lossRate: number;       // 0-1 range (e.g. 0.1 = 10%)
-  useAutoDensity: boolean; // true = use smart density from reference data analysis
 }
 
 export interface CalculationResult {
@@ -22,6 +21,6 @@ export interface CalculationResult {
   calculationMethod: 'lookup' | 'calculated';
   basePoly: number;        // kg (before loss rate)
   baseIso: number;         // kg (before loss rate)
-  appliedDensity: number;  // kg/m³ - actual density used
-  densitySource: 'reference' | 'auto' | 'manual';
+  appliedDensity: number;  // kg/m³ - density used
+  kCoefficient: number;    // K coefficient applied
 }
