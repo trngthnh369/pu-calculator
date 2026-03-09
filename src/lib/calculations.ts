@@ -108,16 +108,19 @@ export function calculate(params: CalculationParams): CalculationResult {
   const refEntry = lookupReference(moldType, outerDiameter, thickness, length);
 
   if (refEntry) {
-    const basePoly = refEntry.polyKg;
-    const baseIso = refEntry.isoKg;
-    const polyol = basePoly * (1 + lossRate);
-    const isocyanate = baseIso * (1 + lossRate);
+    // Reference data was measured at density 150 kg/m³
+    // Scale proportionally when user changes density
+    const densityScale = density / 150;
+    const basePoly = parseFloat((refEntry.polyKg * densityScale).toFixed(2));
+    const baseIso = parseFloat((refEntry.isoKg * densityScale).toFixed(2));
+    const polyol = parseFloat((basePoly * (1 + lossRate)).toFixed(2));
+    const isocyanate = parseFloat((baseIso * (1 + lossRate)).toFixed(2));
 
     return {
-      polyol: parseFloat(polyol.toFixed(2)),
-      isocyanate: parseFloat(isocyanate.toFixed(2)),
+      polyol,
+      isocyanate,
       volume: parseFloat(volume.toFixed(6)),
-      calculationMethod: 'lookup',
+      calculationMethod: density === 150 ? 'lookup' : 'calculated',
       basePoly,
       baseIso,
       appliedDensity: density,
